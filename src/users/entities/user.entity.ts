@@ -4,7 +4,7 @@ import { Role } from "src/enums/roles.enum";
 @Schema({timestamps: true})
 export class User {
     @Prop({type: String})
-    name: string
+    fullName: string
 
     @Prop({type: String, required: true})
     email: string
@@ -14,6 +14,9 @@ export class User {
 
     @Prop({type: String, enum: Role, default: Role.STUDENT})
     role: string
+
+    @Prop({type: String})
+    avatar: string
 }
 
 export const userSchema = SchemaFactory.createForClass(User)

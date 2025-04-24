@@ -1,8 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
 import { QueryParams } from './dto/query-params.dto';
 
@@ -29,11 +28,24 @@ export class UsersService {
     return user
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async updateUser(requesterId: string, targetUserId: string, dto: UpdateUserDto) {
+    const requester = await this.findOne(requesterId);
+  
+    if (requester.role !== 'admin' && requester._id.toString() !== targetUserId) {
+      throw new ForbiddenException('You are not allowed to update this user');
+    }
+  
+    return await this.userModel.findByIdAndUpdate(targetUserId, dto, { new: true });
   }
-
-  remove(id: string) {
-    return `This action removes a #${id} user`;
+  
+  async deleteUser(requesterId: string, targetUserId: string) {
+    const requester = await this.findOne(requesterId);
+  
+    if (requester.role !== 'admin' && requester._id.toString() !== targetUserId) {
+      throw new ForbiddenException('You are not allowed to delete this user');
+    }
+  
+    return this.userModel.findByIdAndDelete(targetUserId);
   }
+  
 }
