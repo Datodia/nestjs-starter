@@ -43,8 +43,5 @@ export class AuthController {
     return this.authService.getCurrentUser(userId)
   }
 
-  @Post('/sign-in/admin')
-  signInAdmin(@Body() {email, password}: SignInDto){
-    return this.authService.signInAdmin({email, password}) 
-  }
+ 
 }

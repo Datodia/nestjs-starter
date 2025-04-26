@@ -52,24 +52,6 @@ export class AuthService {
     return accessToken
   }
 
-  async signInAdmin({ email, password }: SignInDto) {
-    const existUser = await this.userModel.findOne({ email }).select('+password')
-    if (!existUser) throw new BadRequestException('Invalid Credentials')
-
-    const isPassedEqual = await bcrypt.compare(password, existUser.password)
-    if (!isPassedEqual) throw new BadRequestException('Invalid Credentials')
-
-    if (existUser.role !== Role.ADMIN) throw new BadRequestException('Invalid Credentials')
-    const payLoad = {
-      id: existUser._id,
-      role: existUser.role
-    }
-
-    const accessToken = await this.jwtService.sign(payLoad, { expiresIn: '1h' })
-
-    return { accessToken }
-  }
-
   async signUp({ email, fullName, password }: SignUpDto) {
     const existUser = await this.userModel.findOne({ email: email })
     if (existUser) throw new BadRequestException('User Already exists')
